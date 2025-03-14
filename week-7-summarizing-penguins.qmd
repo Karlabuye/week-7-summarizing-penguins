@@ -355,7 +355,10 @@ penguins |>
 
 Starting with penguins, filter to only keep Adelie and Gentoo penguins, then find counts by species and sex.
 ```{r}
-
+#|label: Adelie and Gentoo penguins species and sex
+penguins |>
+  filter(species == c("Adelie","Gentoo"))|>
+  count(species, sex)
 ```
 
 
@@ -384,12 +387,12 @@ Identify what is going on in this code:
 
 ```{r}
 penguins |>
-  select(species, year, flipper_length_mm) |>  #comment
-  rename(study_year = year) |>   #comment
-  filter(species == "Adelie") |>  #comment
-  mutate(flipper_rank = case_when(   #comment
-    flipper_length_mm < 200 ~ 1,   #comment
-    flipper_length_mm >= 200 ~ 2,  #comment
+  select(species, year, flipper_length_mm) |>  #selects the variables to deal with 
+  rename(study_year = year) |>   #renames the year variable study_year
+  filter(species == "Adelie") |>  #looks only at adelie species
+  mutate(flipper_rank = case_when(   #creates flipper_rank variable
+    flipper_length_mm < 200 ~ 1,   #when less than 200mm ranked 1
+    flipper_length_mm >= 200 ~ 2,  #when creater than or = 200 ranked 2
     TRUE ~ 0 # 0 for anything else
   ))
 ```
@@ -402,14 +405,30 @@ Add a new column to penguins called study_year that contains:
 - “Year 3” if the year is 2009 
 
 ```{r}
-
+#|label: using case_when
+penguins |>
+  mutate(study_year = case_when(  
+    year == 2007 ~ "Year 1",   
+    year == 2008 ~ "Year 2",  
+    year == 2009 ~ "Year 3"))
 ```
 
 
 Starting with penguins, only keep observations for chinstrap penguins, then only keep the `flipper_length_mm` and `body_mass_g` variables. Add a new column called `fm_ratio` that contains the ratio of flipper length to body mass for each penguin. Next, add another column named `ratio_bin` which contains the word “high” if `fm_ratio` is greater than or equal to 0.05, “low” if the ratio is less than 0.05, and “no record” if anything else (e.g. NA). 
 
 ```{r}
-
+#|label: putting it all together
+names(penguins)
+penguins |>
+  filter(species == "Chinstrap")|>
+  select(flipper_length_mm,body_mass_g)|>
+  mutate(fm_ratio = flipper_length_mm/ body_mass_g)|>
+  mutate(ratio_bin = case_when(
+    fm_ratio >=0.05 ~ "high",
+    fm_ratio <0.05 ~ "low", 
+    TRUE ~ NA
+  ))
+  
 ```
 
 
