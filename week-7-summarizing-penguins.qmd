@@ -81,8 +81,10 @@ Create new variable called `bill_ratio` that is the ratio of length to depth (le
 ```{r}
 #|label: bill_ratio 
 names(penguins)
-penguins |>
+
+penguins <-penguins |>
   mutate(bill_ratio = bill_length_mm / bill_depth_mm)
+
 ```
 
 
@@ -92,7 +94,10 @@ Now create a boxplot of `bill_ratio` split by species.  Be sure to add labels to
 #| label: boxplot bill ratio
 
 ggplot(penguins)+
-  geom_boxplot(aes(x= bill_ratio))
+  geom_boxplot(aes(y = species,x= bill_ratio, color = species))+
+  theme_bw()+
+  labs(x= "Bill Ratio", y= "Species", title= "Species Bill Ratio's")+
+  guides(color = "none")
 
 ```
 
