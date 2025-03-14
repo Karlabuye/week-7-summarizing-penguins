@@ -325,19 +325,19 @@ penguins |>
 For example, what does the following code do?
 ```{r}
 penguins |>
-  count(species, year)
+  count(species, year)#counts number of species per year
 ```
 
 We can combine `count()` with `mutate()` to find proportions and the visualize them - comment the following code:
 ```{r}
 penguins |> 
-  count(species, island) |> #comment
-  group_by(species) |> #comment 
-  mutate(total = sum(n),  #comment
-         prop = n/total) |>  #comment
-  ggplot(aes(x = island, y = prop, fill = species)) + #comment
-  geom_col(position = position_dodge()) + #comment
-  scale_fill_viridis_d() + #comment
+  count(species, island) |> #number of species per island
+  group_by(species) |> #group by the species 
+  mutate(total = sum(n),  #create variable total for the total of species
+         prop = n/total) |>  #number of species div by total fro the propotion of species per island 
+  ggplot(aes(x = island, y = prop, fill = species)) + #create the aesthetics for the figure
+  geom_col(position = position_dodge()) + #create the geometry for the figure
+  scale_fill_viridis_d() + #add color blind friendly color
   labs(x = "Palmer Islands",
        y = "Proportion of Penguin Species per Island",
        fill = "Species") +
@@ -347,7 +347,9 @@ penguins |>
 ### Practice with `count()`
 Starting with penguins, find counts of observation by species, island, and year.
 ```{r}
-
+#|label: count by species, island, and year
+penguins |>
+  count(species, year,island)
 ```
 
 
