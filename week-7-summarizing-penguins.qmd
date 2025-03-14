@@ -105,21 +105,28 @@ ggplot(penguins)+
 Add three new columns to penguins within one `mutate()` function: one column that contains the bill ratio (bill length / bill depth), one that contains the body mass converted to kg, and one that contains the flipper length converted to meters.
 
 ```{r}
+#| label: adding bill_ratio, body_mass_kg, flipper_length_m
+names(penguins)
 penguins |>
-  mutate(bill_ratio = ___________,
-         body_mass_kg = ___________,
-         flipper_length_m = ______________)
+  mutate(bill_ratio = bill_length_mm / bill_depth_mm,
+         body_mass_kg = body_mass_g/1000,
+         flipper_length_m = flipper_length_mm/1000)
 ```
 
 
 We can also use `mutate()` to modify an existing variable.  By default, R reports factors in alphabetical order (you may notice in your boxplot they always print in the same order, Adelie, Chinstrap, Gentoo). If we want to reorder, we can use a function `fct_relevel()` from the `forcats` package, which we will learn about in a few weeks. Modify the code below to calculate the `bill_ratio` and then recreate the boxplot from above by species - how does it differ? 
 
 ```{r}
+#| label: reordered species bill_ratio boxplot
 penguins |> 
   mutate(species = 
            fct_relevel(species, "Adelie", "Gentoo", "Chinstrap"),
-         bill_ratio = ___________) |> 
-  ___________
+         bill_ratio = bill_length_mm / bill_depth_mm) |> 
+ggplot()+
+  geom_boxplot(aes(y = species,x= bill_ratio, color = species))+
+  theme_bw()+
+  labs(x= "Bill Ratio", y= "Species", title= "Species Bill Ratio's")+
+  guides(color = "none")
   
 ```
 
@@ -154,16 +161,24 @@ Second Note, if you use `mosaic` in your statistics class, note that `mean()` us
 Find the mean and standard deviation of body mass in *kilograms* by species and sex.
 
 ```{r}
+#|label: mean adn sd of body mass
 penguins |> 
-  _________(body_mass_kg = ____________) |> 
-  group_by(_______________) |> 
-  summarize(_______________)
+  mutate(body_mass_kg = body_mass_g/1000) |> 
+  group_by(species, sex) |> 
+  summarize(mass_mean = mean(body_mass_kg, na.rm = TRUE),
+            mass_sd = sd(body_mass_kg, na.rm = TRUE))
 ```
 
 
 Starting with penguins, create a summary table containing the maximum and minimum length of flippers (call the columns flip_max and flip_min) for just Chinstrap penguins, grouped by island. (Hint - remember `filter()`)
 
 ```{r}
+#|label: max min flipper length
+names(penguins)
+penguins |>
+  filter(species == "Chinstrap")|>
+  group_by(island)|>
+  mutate(flip_max = max(flipper_length_mm), flip_min = min(flipper_length_mm))
 
 ```
 
@@ -177,6 +192,14 @@ Starting with penguins, in a piped sequence:
 - Create a summary table containing the mean of the bill_ratio variable, by species (name the column in the summary table bill_ratio_mean)  
 
 ```{r}
+#| label: mean bill ratio only
+names(penguins)
+penguins |>
+  mutate(bill_ratio== bill_length_mm / bill_depth_mm)|>
+  select(species, bill_ratio)|>
+  group_by(species)|>
+  mutate(bill_ratio_mean = mean(bill_ratio, na.rm = TRUE))
+
 
 ```
 
@@ -251,7 +274,13 @@ Starting with penguins, group data by island then use `across()` to find the med
 Bonus Point: The names in the resulting table should be the original column name followed by an underscore, then the word “median” (e.g. `colname_median`).
 
 ```{r}
-
+#|label: using across
+penguins |>
+  group_by(island) |>
+  summarize(across(contains("mm"),
+                   list(median= median),
+                   na.rm = TRUE,
+                   .names = "{.col}_{.fn}"))
 ```
 
 Starting from penguins, write a piped sequence to:  
@@ -262,7 +291,16 @@ Starting from penguins, write a piped sequence to:
 - Group the data by `spp_penguin`  
 - Find the mean value for any variable containing the string “length”, by penguin species, with column names updated to the original column name appended with "_mean" at the end  
 ```{r}
-
+#|label: using across()
+penguins|>
+  filter(island != "Biscoe")|>
+  rename(spp_penguin = species)|>
+  group_by(spp_penguin)|>
+  summarize(across(contains("length"),
+                   list(mean= mean),
+                   na.rm = TRUE,
+                   .names = "{.col}_{.fn}"))
+  
 ```
 
 
